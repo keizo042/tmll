@@ -1,12 +1,12 @@
 fn main() {
     let mut v: Vec<L> = vec![];
-    let mut tm = State::new(&mut v, 0);
+    let mut tm = State::new(&mut v, 1);
     println!("{}", tm.start());
 }
 
 #[derive(Clone)]
 struct State<'a> {
-    tape: &'a [L],
+    tape: &'a Vec<L>,
     ptr: usize,
 }
 
@@ -36,7 +36,7 @@ enum L {
 }
 
 impl<'a> State<'a> {
-    fn new(l: &'a mut [L], i: usize) -> State {
+    fn new(l: &'a mut Vec<L>, i: usize) -> State {
         return State { tape: l, ptr: i };
     }
 
@@ -55,86 +55,107 @@ impl<'a> State<'a> {
         let p = self.ptr;
         let n = self.tape[p].clone();
         match s {
-            S::Init => match n {
-                L::Blunk => S::Rej,
-                L::W => {
-                    self.ptr += 1;
-                    return S::Two;
-                },
-                _ => S::One,
-            },
+            S::Init => {
+                match n {
+                    L::Blunk => S::Rej,
+                    L::W => {
+                        self.ptr += 1;
+                        return S::Two;
+                    }
+                    _ => S::One,
+                }
+            }
             S::One => {
                 match n {
                     L::Zero => S::Three,
                     L::One => S::Six,
-                    L::W => S::Rej, /* not yet implmenet */
+                    L::W => {
+                        self.ptr += 1;
+                        return S::Two;
+                    },
+                    L::Blunk => {
+                        self.ptr += 1;
+                        return S::One;
+                    }
                     _ => {
                         return S::Rej;
-                    },
+                    }
                 }
-            },
+            }
             S::Two => {
                 match n {
                     L::Blunk => return S::Acc,
                     _ => S::Rej,
                 }
-            },
-            S::Three => match n {
-                L::Zero | L::One => {
-                    self.ptr += 1;
-                    return S::Three;
-                },
-                L::Blunk => {
-                    self.ptr -= 1;
-                    return S::Four;
-                },
-                _ => S::Rej,
-            },
-            S::Four => match n {
-                L::Blunk => {
-                    self.ptr -= 1;
-                    return S::Four;
-                },
-                L::Zero => {
-                    let p = self.ptr;
-                    let t = self.tape.clone();
-                    t[p] = L::Blunk;
-                    self.ptr -= 1;
-                    return S::Five;
-                },
-                _ => S::Rej,
-            },
-            S::Five => match n {
-                L::Blunk => {
-                    self.ptr += 1;
-                    return S::One;
-                },
-                _ => {
-                    self.ptr -= 1;
-                    return S::Five;
-                },
-            },
-            S::Six => match n {
-                L::Zero | L::One => {
-                    self.ptr += 1;
-                    return S::Six;
-                },
-                L::Blunk => {
-                    self.ptr -= 1;
-                    return S::Seven;
-                },
-                _ => S::Rej,
-            },
-            S::Seven => match n {
-                L::One => {
-                    self.tape[self.ptr] = L::Blunk;
-                    self.ptr -= 1;
-                    return S::Five;
-                },
-                _ => {
-                    return S::Rej;
-                },
-            },
+            }
+            S::Three => {
+                match n {
+                    L::Zero | L::One => {
+                        self.ptr += 1;
+                        return S::Three;
+                    }
+                    L::Blunk => {
+                        self.ptr -= 1;
+                        return S::Four;
+                    }
+                    _ => S::Rej,
+                }
+            }
+            S::Four => {
+                match n {
+                    L::Blunk => {
+                        self.ptr -= 1;
+                        return S::Four;
+                    }
+                    L::Zero => {
+                        let p = self.ptr;
+                        let mut t = self.tape.clone();
+                        t[p] = L::Blunk;
+                        self.ptr -= 1;
+                        return S::Five;
+                    }
+                    _ => S::Rej,
+                }
+            }
+            S::Five => {
+                match n {
+                    L::Blunk => {
+                        self.ptr += 1;
+                        return S::One;
+                    }
+                    _ => {
+                        self.ptr -= 1;
+                        return S::Five;
+                    }
+                }
+            }
+            S::Six => {
+                match n {
+                    L::Zero | L::One => {
+                        self.ptr += 1;
+                        return S::Six;
+                    }
+                    L::Blunk => {
+                        self.ptr -= 1;
+                        return S::Seven;
+                    }
+                    _ => S::Rej,
+                }
+            }
+            S::Seven => {
+                match n {
+                    L::One => {
+                        let p = self.ptr;
+                        let mut t = self.tape.clone();
+                        t[p] = L::Blunk;
+                        self.ptr -= 1;
+                        return S::Five;
+                    }
+                    _ => {
+                        return S::Rej;
+                    }
+                }
+            }
             S::Eight => S::Rej,
             S::Nine => S::Rej,
             S::Ten => S::Rej,
@@ -148,30 +169,29 @@ impl<'a> State<'a> {
 
 #[test]
 fn test1() {
-    let mut v = [L::Blunk, L::Zero, L::One, L::W, L::One, L::Zero, L::Blunk];
-    let mut n: usize = 0;
-    let mut tm = State::new(&mut v, 0);
+    let mut v = vec![L::Blunk, L::Zero, L::One, L::W, L::One, L::Zero, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
 
     assert_eq!(true, tm.start());
 }
 
 #[test]
 fn test2() {
-    let mut v = [L::Blunk, L::One, L::W, L::Zero, L::Blunk];
-    let mut tm = State::new(&mut v, 0);
+    let mut v = vec![L::Blunk, L::One, L::W, L::Zero, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
 #[test]
 fn test3() {
-    let mut v = [L::Blunk];
-    let mut tm = State::new(&mut v, 0);
+    let mut v = vec![L::Blunk];
+    let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
 #[test]
 fn test4() {
-    let mut v = [L::Blunk, L::W, L::Blunk];
-    let mut tm = State::new(&mut v, 0);
+    let mut v = vec![L::Blunk, L::W, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
     assert_eq!(true, tm.start());
 }
