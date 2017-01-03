@@ -175,7 +175,7 @@ fn test2() {
 
 #[test]
 fn test3() {
-    let mut v = vec![L::Blunk];
+    let mut v = vec![L::Blunk, L::Blunk];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
