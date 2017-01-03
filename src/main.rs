@@ -1,5 +1,5 @@
 fn main() {
-    let mut v: Vec<L> = vec![];
+    let mut v: Vec<L> = vec![L::Blunk, L::One, L::W, L::One, L::Blunk];
     let mut tm = State::new(&mut v, 1);
     println!("{}", tm.start());
 }
@@ -21,15 +21,12 @@ enum S {
     Five,
     Six,
     Seven,
-    Eight,
-    Nine,
-    Ten,
 }
 
 #[derive(Clone)]
 enum L {
     Blunk,
-    X,
+//    X,
     One,
     Zero,
     W,
@@ -76,9 +73,6 @@ impl<'a> State<'a> {
                     L::Blunk => {
                         self.ptr += 1;
                         return S::One;
-                    }
-                    _ => {
-                        return S::Rej;
                     }
                 }
             }
@@ -155,10 +149,7 @@ impl<'a> State<'a> {
                         return S::Rej;
                     }
                 }
-            }
-            S::Eight => S::Rej,
-            S::Nine => S::Rej,
-            S::Ten => S::Rej,
+            },
             _ => S::Rej,
         }
     }
