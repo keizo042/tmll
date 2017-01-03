@@ -26,7 +26,7 @@ enum S {
 #[derive(Clone)]
 enum L {
     Blunk,
-//    X,
+    X,
     One,
     Zero,
     W,
@@ -64,15 +64,19 @@ impl<'a> State<'a> {
             }
             S::One => {
                 match n {
-                    L::Zero => S::Three,
-                    L::One => S::Six,
                     L::W => {
                         self.ptr += 1;
                         return S::Two;
                     },
-                    L::Blunk => {
+                    L::Zero => S::Three,
+                    L::One => S::Six,
+                    L::X => {
                         self.ptr += 1;
                         return S::One;
+                    }
+                    L::Blunk => {
+                        // WIP
+                        return S::Rej;
                     }
                 }
             }
@@ -84,27 +88,26 @@ impl<'a> State<'a> {
             }
             S::Three => {
                 match n {
-                    L::Zero | L::One => {
-                        self.ptr += 1;
-                        return S::Three;
-                    }
                     L::Blunk => {
                         self.ptr -= 1;
                         return S::Four;
                     }
-                    _ => S::Rej,
+                    _ => {
+                        self.ptr += 1;
+                        return S::Three;
+                    }
                 }
             }
             S::Four => {
                 match n {
-                    L::Blunk => {
+                    L::X => {
                         self.ptr -= 1;
                         return S::Four;
                     }
                     L::Zero => {
                         let p = self.ptr;
                         let mut t = self.tape.clone();
-                        t[p] = L::Blunk;
+                        t[p] = L::X;
                         self.ptr -= 1;
                         return S::Five;
                     }
@@ -125,15 +128,14 @@ impl<'a> State<'a> {
             }
             S::Six => {
                 match n {
-                    L::Zero | L::One => {
-                        self.ptr += 1;
-                        return S::Six;
-                    }
                     L::Blunk => {
                         self.ptr -= 1;
                         return S::Seven;
+                    },
+                    _ => {
+                        self.ptr += 1;
+                        return S::Six;
                     }
-                    _ => S::Rej,
                 }
             }
             S::Seven => {
@@ -141,10 +143,14 @@ impl<'a> State<'a> {
                     L::One => {
                         let p = self.ptr;
                         let mut t = self.tape.clone();
-                        t[p] = L::Blunk;
+                        t[p] = L::X;
                         self.ptr -= 1;
                         return S::Five;
                     }
+                    L::X => {
+                        self.ptr -= 1;
+                        return S::Seven;
+                    },
                     _ => {
                         return S::Rej;
                     }
