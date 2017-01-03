@@ -4,8 +4,9 @@ fn main() {
     println!("{}", tm.start());
 }
 
+#[derive(Clone)]
 struct State<'a> {
-    tape: &'a Vec<L>,
+    tape: &'a [L],
     ptr: usize,
 }
 
@@ -35,7 +36,7 @@ enum L {
 }
 
 impl<'a> State<'a> {
-    fn new(l: &'a mut Vec<L>, i: usize) -> State<'a> {
+    fn new(l: &'a mut [L], i: usize) -> State {
         return State { tape: l, ptr: i };
     }
 
@@ -57,7 +58,7 @@ impl<'a> State<'a> {
             S::Init => match n {
                 L::Blunk => S::Rej,
                 L::W => {
-                    self.ptr+=1;
+                    self.ptr += 1;
                     return S::Two;
                 },
                 _ => S::One,
@@ -66,7 +67,7 @@ impl<'a> State<'a> {
                 match n {
                     L::Zero => S::Three,
                     L::One => S::Six,
-                    L::W => S::Rej; /* not yet implmenet */
+                    L::W => S::Rej, /* not yet implmenet */
                     _ => {
                         return S::Rej;
                     },
@@ -80,29 +81,32 @@ impl<'a> State<'a> {
             },
             S::Three => match n {
                 L::Zero | L::One => {
-                    self.ptr+=1;
+                    self.ptr += 1;
                     return S::Three;
                 },
                 L::Blunk => {
-                    self.ptr-=1;
+                    self.ptr -= 1;
                     return S::Four;
                 },
                 _ => S::Rej,
             },
             S::Four => match n {
                 L::Blunk => {
-                    self.ptr-=1;
+                    self.ptr -= 1;
                     return S::Four;
                 },
                 L::Zero => {
-                    self.tape[self.ptr] = L::Blunk;
-                    self.ptr-=1;
+                    let p = self.ptr;
+                    let t = self.tape.clone();
+                    t[p] = L::Blunk;
+                    self.ptr -= 1;
                     return S::Five;
-                }
+                },
+                _ => S::Rej,
             },
             S::Five => match n {
                 L::Blunk => {
-                    sefl.ptr += 1;
+                    self.ptr += 1;
                     return S::One;
                 },
                 _ => {
@@ -111,9 +115,26 @@ impl<'a> State<'a> {
                 },
             },
             S::Six => match n {
+                L::Zero | L::One => {
+                    self.ptr += 1;
+                    return S::Six;
+                },
+                L::Blunk => {
+                    self.ptr -= 1;
+                    return S::Seven;
+                },
                 _ => S::Rej,
             },
-            S::Seven => S::Rej,
+            S::Seven => match n {
+                L::One => {
+                    self.tape[self.ptr] = L::Blunk;
+                    self.ptr -= 1;
+                    return S::Five;
+                },
+                _ => {
+                    return S::Rej;
+                },
+            },
             S::Eight => S::Rej,
             S::Nine => S::Rej,
             S::Ten => S::Rej,
@@ -127,7 +148,7 @@ impl<'a> State<'a> {
 
 #[test]
 fn test1() {
-    let mut v: Vec<L> = vec![L::Blunk, L::Zero, L::One, L::W, L::One, L::Zero, L::Blunk];
+    let mut v = [L::Blunk, L::Zero, L::One, L::W, L::One, L::Zero, L::Blunk];
     let mut n: usize = 0;
     let mut tm = State::new(&mut v, 0);
 
@@ -136,21 +157,21 @@ fn test1() {
 
 #[test]
 fn test2() {
-    let mut v: Vec<L> = vec![L::Blunk, L::One, L::W, L::Zero, L::Blunk];
+    let mut v = [L::Blunk, L::One, L::W, L::Zero, L::Blunk];
     let mut tm = State::new(&mut v, 0);
     assert_eq!(false, tm.start());
 }
 
 #[test]
 fn test3() {
-    let mut v: Vec<L> = vec![L::Blunk];
+    let mut v = [L::Blunk];
     let mut tm = State::new(&mut v, 0);
     assert_eq!(false, tm.start());
 }
 
 #[test]
 fn test4() {
-    let mut v: Vec<L> = vec![L::Blunk, L::W, L::Blunk];
+    let mut v = [L::Blunk, L::W, L::Blunk];
     let mut tm = State::new(&mut v, 0);
     assert_eq!(true, tm.start());
 }
