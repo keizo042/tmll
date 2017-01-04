@@ -192,3 +192,19 @@ fn test4() {
     let mut tm = State::new(&mut v, 1);
     assert_eq!(true, tm.start());
 }
+
+#[test]
+fn test5() {
+    let mut v = vec![ L::Blunk, L::One,  L::W, L::One, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
+    assert_eq!(true, tm.start());
+
+}
+
+#[test]
+fn test6() {
+    let mut v = vec![ L::Blunk, L::Zero,  L::W, L::Zero, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
+    assert_eq!(true, tm.start());
+}
+
