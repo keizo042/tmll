@@ -37,6 +37,14 @@ impl<'a> State<'a> {
         return State { tape: l, ptr: i };
     }
 
+    fn left(&mut self) {
+        self.ptr-=1;
+    }
+
+    fn right(&mut self) {
+        self.ptr += 1;
+    }
+
     fn start(&mut self) -> bool {
         let mut state = S::Init;
         loop {
@@ -48,6 +56,33 @@ impl<'a> State<'a> {
         }
     }
 
+    //
+    // State Transimition Diagram
+    //
+    //       Init
+    //         |<-|
+    //         |  X
+    //    --> One -----------------------| --> Two ------> Reject
+    //    |    |                         |           |
+    //    |   0,1                        |           |
+    //    |    |                         |           |
+    //    |  Three<---|                 Six<--|      |---> Accept
+    //    |    |--*---|                  |----|
+    //    |    |                         |
+    //    |    |                         |
+    //    |    |                         |
+    //    |  blunk                    blunk 
+    //    |    |                         |
+    //    |    |                         |
+    //    |    |                         |
+    //    |   Four --*--> Reject       Seven -*-> Reject
+    //    |    |                         |
+    //    |    |                         |
+    //    |    |                         |
+    //    |-- Five<----------------------|
+    //        |  |
+    //        ----
+    //
     fn step(&mut self, s: S) -> S {
         let p = self.ptr;
         let n = self.tape[p].clone();
@@ -56,7 +91,7 @@ impl<'a> State<'a> {
                 match n {
                     L::Blunk => S::Rej,
                     L::W => {
-                        self.ptr += 1;
+                        self.right();
                         return S::Two;
                     }
                     _ => S::One,
@@ -65,17 +100,16 @@ impl<'a> State<'a> {
             S::One => {
                 match n {
                     L::W => {
-                        self.ptr += 1;
+                        self.right();
                         return S::Two;
                     },
                     L::Zero => S::Three,
                     L::One => S::Six,
                     L::X => {
-                        self.ptr += 1;
+                        self.right();
                         return S::One;
                     }
                     L::Blunk => {
-                        // WIP
                         return S::Rej;
                     }
                 }
@@ -89,11 +123,11 @@ impl<'a> State<'a> {
             S::Three => {
                 match n {
                     L::Blunk => {
-                        self.ptr -= 1;
+                        self.left();
                         return S::Four;
                     }
                     _ => {
-                        self.ptr += 1;
+                        self.right();
                         return S::Three;
                     }
                 }
@@ -101,14 +135,17 @@ impl<'a> State<'a> {
             S::Four => {
                 match n {
                     L::X => {
-                        self.ptr -= 1;
+                        self.left();
                         return S::Four;
+                    }
+                    L::W => {
+                        return S::Rej;
                     }
                     L::Zero => {
                         let p = self.ptr;
                         let mut t = self.tape.clone();
                         t[p] = L::X;
-                        self.ptr -= 1;
+                        self.left();
                         return S::Five;
                     }
                     _ => S::Rej,
@@ -117,11 +154,11 @@ impl<'a> State<'a> {
             S::Five => {
                 match n {
                     L::Blunk => {
-                        self.ptr += 1;
+                        self.right();
                         return S::One;
                     }
                     _ => {
-                        self.ptr -= 1;
+                        self.left();
                         return S::Five;
                     }
                 }
@@ -129,11 +166,11 @@ impl<'a> State<'a> {
             S::Six => {
                 match n {
                     L::Blunk => {
-                        self.ptr -= 1;
+                        self.left();
                         return S::Seven;
                     },
                     _ => {
-                        self.ptr += 1;
+                        self.right();
                         return S::Six;
                     }
                 }
@@ -144,11 +181,14 @@ impl<'a> State<'a> {
                         let p = self.ptr;
                         let mut t = self.tape.clone();
                         t[p] = L::X;
-                        self.ptr -= 1;
+                        self.left();
                         return S::Five;
                     }
+                    L::W => {
+                        return S::Rej;
+                    }
                     L::X => {
-                        self.ptr -= 1;
+                        self.left();
                         return S::Seven;
                     },
                     _ => {
