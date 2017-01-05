@@ -4,9 +4,8 @@ fn main() {
     println!("{}", tm.start());
 }
 
-#[derive(Clone)]
 struct State<'a> {
-    tape: &'a Vec<L>,
+    tape: &'a mut Vec<L>,
     ptr: usize,
 }
 
@@ -82,12 +81,12 @@ impl<'a> State<'a> {
                         return S::Acc;
                     }
                     L::Zero => {
-                        let mut tape = self.tape.clone();
+                        let ref mut tape = self.tape;
                         tape[p] = L::X;
                         return S::B;
                     }
                     L::One => {
-                        let mut tape = self.tape.clone();
+                        let ref mut tape = self.tape;
                         let p = self.ptr;
                         tape[p] = L::X;
                         return S::D;
@@ -115,7 +114,7 @@ impl<'a> State<'a> {
                         return S::C;
                     }
                     L::Zero => {
-                        let mut tape = self.tape.clone();
+                        let ref mut tape = self.tape;
                         let p = self.ptr;
                         tape[p] = L::X;
                         return S::F;
@@ -146,7 +145,7 @@ impl<'a> State<'a> {
                         return S::E;
                     }
                     L::One => {
-                        let mut tape = self.tape.clone();
+                        let ref mut tape = self.tape;
                         let p = self.ptr;
                         tape[p] = L::X;
                         return S::F;
@@ -218,6 +217,27 @@ fn test5() {
 #[test]
 fn test6() {
     let mut v = vec![L::Blunk, L::Zero, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
+    assert_eq!(false, tm.start());
+}
+
+#[test] 
+fn test7() {
+    let mut v = vec![L::Blunk, L::One, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
+    assert_eq!(false, tm.start());
+}
+
+#[test] 
+fn test8() {
+    let mut v = vec![L::Blunk, L::One, L::One, L::Blunk];
+    let mut tm = State::new(&mut v, 1);
+    assert_eq!(false, tm.start());
+}
+
+#[test] 
+fn test9() {
+    let mut v = vec![L::Blunk, L::Zero, L::Zero, L::Blunk];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
