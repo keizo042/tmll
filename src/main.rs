@@ -1,5 +1,6 @@
 fn main() {
-    let mut v: Vec<L> = vec![L::Blank, L::One, L::Zero, L::Zero, L::Zero, L::Zero, L::One, L::Blank];
+    let mut v: Vec<L> = vec![L::Blank, L::One, L::Zero, L::Zero, L::Zero, L::Zero, L::One,
+                             L::Blank];
     let mut tm = State::new(&mut v, 1);
     println!("{}", tm.start());
 }
@@ -221,21 +222,21 @@ fn test6() {
     assert_eq!(false, tm.start());
 }
 
-#[test] 
+#[test]
 fn test7() {
     let mut v = vec![L::Blank, L::One, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
-#[test] 
+#[test]
 fn test8() {
     let mut v = vec![L::Blank, L::One, L::One, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(true, tm.start());
 }
 
-#[test] 
+#[test]
 fn test9() {
     let mut v = vec![L::Blank, L::Zero, L::Zero, L::Blank];
     let mut tm = State::new(&mut v, 1);
