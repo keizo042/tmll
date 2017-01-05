@@ -14,16 +14,16 @@ enum S {
     Acc,
     Rej,
     Init,
-    One,
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G
 }
 
-#[derive(Clone)]
+#[derive(Clone,Copy)]
 enum L {
     Blunk,
     X,
@@ -61,27 +61,9 @@ impl<'a> State<'a> {
     //       Init
     //         |<-|
     //         |  X
-    //    --> One -----------------------| --> Two ------> Reject
-    //    |    |                         |           |
-    //    |   0,1                        |           |
-    //    |    |                         |           |
-    //    |  Three<---|                 Six<--|      |---> Accept
-    //    |    |--*---|                  |----|
-    //    |    |                         |
-    //    |    |                         |
-    //    |    |                         |
-    //    |  blunk                    blunk 
-    //    |    |                         |
-    //    |    |                         |
-    //    |    |                         |
-    //    |   Four --*--> Reject       Seven -*-> Reject
-    //    |    |                         |
-    //    |    |                         |
-    //    |    |                         |
-    //    |-- Five<----------------------|
-    //        |  |
-    //        ----
     //
+    //
+
     fn step(&mut self, s: S) -> S {
         let p = self.ptr;
         let n = self.tape[p].clone();
@@ -89,99 +71,19 @@ impl<'a> State<'a> {
             S::Init => {
                 match n {
                     L::Blunk => S::Rej,
-                    _ => S::One,
+                    _ => S::A,
                 }
             }
-            S::One => {
+            S::A => {
                 match n {
-                    L::Zero => S::Three,
-                    L::One => S::Six,
-                    L::X => {
-                        self.right();
-                        return S::One;
-                    }
-                    L::Blunk => {
-                        return S::Rej;
-                    }
-                }
-            }
-            S::Two => {
-                match n {
-                    L::Blunk => return S::Acc,
-                    _ => S::Rej,
-                }
-            }
-            S::Three => {
-                match n {
-                    L::Blunk => {
-                        self.left();
-                        return S::Four;
-                    }
-                    _ => {
-                        self.right();
-                        return S::Three;
-                    }
-                }
-            }
-            S::Four => {
-                match n {
-                    L::X => {
-                        self.left();
-                        return S::Four;
-                    }
-                    L::Zero => {
-                        let p = self.ptr;
-                        let mut t = self.tape.clone();
-                        t[p] = L::X;
-                        self.left();
-                        return S::Five;
-                    }
-                    _ => S::Rej,
-                }
-            }
-            S::Five => {
-                match n {
-                    L::Blunk => {
-                        self.right();
-                        return S::One;
-                    }
-                    _ => {
-                        self.left();
-                        return S::Five;
-                    }
-                }
-            }
-            S::Six => {
-                match n {
-                    L::Blunk => {
-                        self.left();
-                        return S::Seven;
-                    },
-                    _ => {
-                        self.right();
-                        return S::Six;
-                    }
-                }
-            }
-            S::Seven => {
-                match n {
-                    L::One => {
-                        let p = self.ptr;
-                        let mut t = self.tape.clone();
-                        t[p] = L::X;
-                        self.left();
-                        return S::Five;
-                    }
-                    L::X => {
-                        self.left();
-                        return S::Seven;
-                    },
                     _ => {
                         return S::Rej;
                     }
                 }
-            },
-            _ => S::Rej,
+            }
+            _ => {
+                return S::Rej;
+            }
         }
     }
 }
@@ -232,4 +134,5 @@ fn test6() {
     let mut tm = State::new(&mut v, 1);
     assert_eq!(true, tm.start());
 }
+
 
