@@ -64,7 +64,7 @@ impl<'a> State<'a> {
 
     fn step(&mut self, s: S) -> S {
         let p = self.ptr;
-        let n = self.tape[p].clone();
+        let n = self.tape[p];
         match s {
             S::Init => {
                 match n {
@@ -204,7 +204,7 @@ fn test3() {
 fn test4() {
     let mut v = vec![L::Blunk, L::Blunk];
     let mut tm = State::new(&mut v, 1);
-    assert_eq!(true, tm.start());
+    assert_eq!(false, tm.start());
 }
 
 #[test]
