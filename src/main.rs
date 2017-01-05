@@ -20,7 +20,6 @@ enum S {
     D,
     E,
     F,
-    G
 }
 
 #[derive(Clone,Copy)]
@@ -73,12 +72,101 @@ impl<'a> State<'a> {
                     L::Blunk => S::Rej,
                     _ => S::A,
                 }
-            }
+            },
             S::A => {
                 match n {
-                    _ => {
-                        return S::Rej;
-                    }
+                    L::X => {
+                        self.right();
+                        return S::A;
+                    },
+                    L::Blunk => {
+                        return S::Acc;
+                    },
+                    L::Zero => {
+                        let mut tape = self.tape.clone();
+                        tape[p] = L::X;
+                        return S::B;
+                    },
+                    L::One => {
+                        let mut tape = self.tape.clone();
+                        let p = self.ptr;
+                        tape[p] = L::X;
+                        return S::D;
+                    },
+                }
+            },
+            // match Zero
+            S::B => {
+                match n {
+                L::Blunk => {
+                    self.left();
+                    return S::C;
+                },
+                _ => {
+                    self.right();
+                    return S::B;
+                }
+                }
+
+            },
+            S::C => {
+                match n {
+                L::X => {
+                    self.left();
+                    return S::C;
+                }
+                L::Zero => {
+                    let mut tape = self.tape.clone();
+                    let p = self.ptr;
+                    tape[p] = L::X;
+                    return S::F;
+                },
+                _ => {
+                    return S::Rej;
+                },
+                }
+
+            },
+            // match One
+            S::D => {
+                match n {
+                L::Blunk => {
+                    self.left();
+                    return S::E;
+                },
+                _ => {
+                    self.right();
+                    return S::D;
+                },
+                }
+            },
+            S::E => {
+                match n {
+                L::X => {
+                    self.left();
+                    return S::E;
+                }
+                L::One => {
+                    let mut tape = self.tape.clone();
+                    let p = self.ptr;
+                    tape[p] = L::X;
+                    return S::F;
+                }
+                _ => {
+                    return S::Rej;
+                }
+                }
+            },
+            S::F => {
+                match n {
+                L::Blunk => {
+                    self.right();
+                    return S::A;
+                }
+                _ => {
+                    self.left();
+                    return S::F;
+                },
                 }
             }
             _ => {
@@ -130,9 +218,9 @@ fn test5() {
 
 #[test]
 fn test6() {
-    let mut v = vec![ L::Blunk, L::Zero,  L::Zero, L::Blunk];
+    let mut v = vec![ L::Blunk,  L::Zero, L::Blunk];
     let mut tm = State::new(&mut v, 1);
-    assert_eq!(true, tm.start());
+    assert_eq!(false, tm.start());
 }
 
 
