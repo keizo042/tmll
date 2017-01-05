@@ -1,5 +1,5 @@
 fn main() {
-    let mut v: Vec<L> = vec![L::Blunk, L::One, L::Zero, L::Zero, L::Zero, L::Zero, L::One, L::Blunk];
+    let mut v: Vec<L> = vec![L::Blank, L::One, L::Zero, L::Zero, L::Zero, L::Zero, L::One, L::Blank];
     let mut tm = State::new(&mut v, 1);
     println!("{}", tm.start());
 }
@@ -23,7 +23,7 @@ enum S {
 
 #[derive(Clone,Copy)]
 enum L {
-    Blunk,
+    Blank,
     X,
     One,
     Zero,
@@ -67,7 +67,7 @@ impl<'a> State<'a> {
         match s {
             S::Init => {
                 match n {
-                    L::Blunk => S::Rej,
+                    L::Blank => S::Rej,
                     _ => S::A,
                 }
             }
@@ -77,7 +77,7 @@ impl<'a> State<'a> {
                         self.right();
                         return S::A;
                     }
-                    L::Blunk => {
+                    L::Blank => {
                         return S::Acc;
                     }
                     L::Zero => {
@@ -96,7 +96,7 @@ impl<'a> State<'a> {
             // match Zero
             S::B => {
                 match n {
-                    L::Blunk => {
+                    L::Blank => {
                         self.left();
                         return S::C;
                     }
@@ -127,7 +127,7 @@ impl<'a> State<'a> {
             // match One
             S::D => {
                 match n {
-                    L::Blunk => {
+                    L::Blank => {
                         self.left();
                         return S::E;
                     }
@@ -157,7 +157,7 @@ impl<'a> State<'a> {
             }
             S::F => {
                 match n {
-                    L::Blunk => {
+                    L::Blank => {
                         self.right();
                         return S::A;
                     }
@@ -179,7 +179,7 @@ impl<'a> State<'a> {
 
 #[test]
 fn test1() {
-    let mut v = vec![L::Blunk, L::Zero, L::One, L::One, L::Zero, L::Blunk];
+    let mut v = vec![L::Blank, L::Zero, L::One, L::One, L::Zero, L::Blank];
     let mut tm = State::new(&mut v, 1);
 
     assert_eq!(true, tm.start());
@@ -187,28 +187,28 @@ fn test1() {
 
 #[test]
 fn test2() {
-    let mut v = vec![L::Blunk, L::One, L::Zero, L::Blunk];
+    let mut v = vec![L::Blank, L::One, L::Zero, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
 #[test]
 fn test3() {
-    let mut v = vec![L::Blunk, L::Blunk];
+    let mut v = vec![L::Blank, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
 #[test]
 fn test4() {
-    let mut v = vec![L::Blunk, L::Blunk];
+    let mut v = vec![L::Blank, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
 #[test]
 fn test5() {
-    let mut v = vec![L::Blunk, L::One, L::One, L::Blunk];
+    let mut v = vec![L::Blank, L::One, L::One, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(true, tm.start());
 
@@ -216,28 +216,28 @@ fn test5() {
 
 #[test]
 fn test6() {
-    let mut v = vec![L::Blunk, L::Zero, L::Blunk];
+    let mut v = vec![L::Blank, L::Zero, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
 #[test] 
 fn test7() {
-    let mut v = vec![L::Blunk, L::One, L::Blunk];
+    let mut v = vec![L::Blank, L::One, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(false, tm.start());
 }
 
 #[test] 
 fn test8() {
-    let mut v = vec![L::Blunk, L::One, L::One, L::Blunk];
+    let mut v = vec![L::Blank, L::One, L::One, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(true, tm.start());
 }
 
 #[test] 
 fn test9() {
-    let mut v = vec![L::Blunk, L::Zero, L::Zero, L::Blunk];
+    let mut v = vec![L::Blank, L::Zero, L::Zero, L::Blank];
     let mut tm = State::new(&mut v, 1);
     assert_eq!(true, tm.start());
 }
