@@ -1,5 +1,5 @@
 fn main() {
-    let mut v: Vec<L> = vec![L::Blunk, L::One, L::One, L::Blunk];
+    let mut v: Vec<L> = vec![L::Blunk, L::One, L::Zero, L::Zero, L::Zero, L::Zero, L::One, L::Blunk];
     let mut tm = State::new(&mut v, 1);
     println!("{}", tm.start());
 }
