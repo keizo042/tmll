@@ -4,11 +4,11 @@ turing machine emulator
 
 ## Descriotion
 
-L = {1, 0 , x}
+L = {1, 0 }
 w = {1, 0}
-S = {0,1,2..}
+S = {init, reject, a,b....}
 
-it accepts as follow wxw, e.g. (0100w0010, 1w1, 000w000)
+it accepts as follow ww, e.g. (01000010, 11, 000000)
 
 
 ## Requirement
@@ -18,8 +18,8 @@ rust lang
 
 ## Install
 ```
-cargo build
-cargo test
+$cargo build
+$cargo test or cargo run
 ```
 
 ## LICENSE
@@ -32,5 +32,5 @@ MITL
 
 
 ## Contact me
-twitter : @keizo042
+twitter : @keizo042  
 mail: keizo.bookman at gmail.com  
