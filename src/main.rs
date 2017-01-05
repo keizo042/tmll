@@ -232,12 +232,12 @@ fn test7() {
 fn test8() {
     let mut v = vec![L::Blunk, L::One, L::One, L::Blunk];
     let mut tm = State::new(&mut v, 1);
-    assert_eq!(false, tm.start());
+    assert_eq!(true, tm.start());
 }
 
 #[test] 
 fn test9() {
     let mut v = vec![L::Blunk, L::Zero, L::Zero, L::Blunk];
     let mut tm = State::new(&mut v, 1);
-    assert_eq!(false, tm.start());
+    assert_eq!(true, tm.start());
 }
